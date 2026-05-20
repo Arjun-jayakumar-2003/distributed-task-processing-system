@@ -2,7 +2,19 @@ from django.db import models
 
 
 class Task(models.Model):
-    status = models.CharField(max_length=20)
+    STATUS_CHOICES = [
+        ("PENDING", "PENDING"),
+        ("PROCESSING", "PROCESSING"),
+        ("SUCCESS", "SUCCESS"),
+        ("FAILED", "FAILED"),
+    ]
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="PENDING"
+    )
+    
     payload = models.JSONField()
     result = models.JSONField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
