@@ -7,6 +7,8 @@ from .serializers import TaskSerializer
 
 from django.shortcuts import get_object_or_404
 
+from .tasks import process_task
+
 @api_view(["GET", "POST"])
 def tasks(request):
 
@@ -21,7 +23,8 @@ def tasks(request):
         serializer = TaskSerializer(data=request.data)
 
         if serializer.is_valid():
-            serializer.save()
+            task = serializer.save()
+            process_task.delay(task.id)
 
             return Response(
                 serializer.data,
