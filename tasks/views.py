@@ -15,11 +15,15 @@ def tasks(request):
     if request.method == "GET":
 
         status_filter = request.query_params.get("status")
+        ordering = request.query_params.get("ordering")
 
         tasks = Task.objects.all()
 
         if status_filter:
             tasks = tasks.filter(status=status_filter)
+
+        if ordering:
+            tasks = tasks.order_by(ordering)
 
         serializer = TaskSerializer(tasks, many=True)
 
