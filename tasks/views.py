@@ -6,6 +6,7 @@ from .models import Task
 from .serializers import TaskSerializer
 
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 from .tasks import process_task
 
@@ -18,6 +19,7 @@ def tasks(request):
 
         status_filter = request.query_params.get("status")
         ordering = request.query_params.get("ordering")
+        search = request.query_params.get("search")
 
         tasks = Task.objects.all()
 
@@ -26,6 +28,15 @@ def tasks(request):
 
         if ordering:
             tasks = tasks.order_by(ordering)
+
+        if search:
+            tasks = tasks.filter(
+                Q(status__icontains=search) |
+                Q(payload__icontains=search) |
+                Q(result__icontains=search) |
+                Q(error_message__icontains=search)
+            )
+            
 
         paginator = PageNumberPagination()
 
