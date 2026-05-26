@@ -26,3 +26,13 @@ class Task(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def processing_duration(self):
+        if self.processing_started_at and self.processing_completed_at:
+            return (
+                self.processing_completed_at
+                - self.processing_started_at
+            )
+
+        return None
