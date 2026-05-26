@@ -9,6 +9,8 @@ from django.shortcuts import get_object_or_404
 
 from .tasks import process_task
 
+from rest_framework.pagination import PageNumberPagination
+
 @api_view(["GET", "POST"])
 def tasks(request):
 
@@ -25,9 +27,13 @@ def tasks(request):
         if ordering:
             tasks = tasks.order_by(ordering)
 
-        serializer = TaskSerializer(tasks, many=True)
+        paginator = PageNumberPagination()
 
-        return Response(serializer.data)
+        paginated_tasks = paginator.paginate_queryset(tasks, request)
+
+        serializer = TaskSerializer(paginated_tasks, many=True)
+
+        return paginator.get_paginated_response(serializer.data)
 
     elif request.method == "POST":
         serializer = TaskSerializer(data=request.data)
