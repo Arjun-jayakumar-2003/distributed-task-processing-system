@@ -13,7 +13,13 @@ from .tasks import process_task
 def tasks(request):
 
     if request.method == "GET":
+
+        status_filter = request.query_params.get("status")
+
         tasks = Task.objects.all()
+
+        if status_filter:
+            tasks = tasks.filter(status=status_filter)
 
         serializer = TaskSerializer(tasks, many=True)
 
