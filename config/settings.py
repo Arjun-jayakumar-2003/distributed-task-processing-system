@@ -11,9 +11,28 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+class DefaultFieldsFilter(logging.Filter):
+
+    def filter(self, record):
+
+        if not hasattr(record, "task_id"):
+            record.task_id = "N/A"
+
+        if not hasattr(record, "status"):
+            record.status = "N/A"
+
+        if not hasattr(record, "retry_count"):
+            record.retry_count = "N/A"
+
+        if not hasattr(record, "error"):
+            record.error = "N/A"
+
+        return True
 
 
 # Quick-start development settings - unsuitable for production
@@ -130,6 +149,11 @@ REST_FRAMEWORK = {
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "filters": {
+        "default_fields": {
+            "()": DefaultFieldsFilter,
+        },
+    },
 
     "formatters": {
         "structured": {
@@ -150,6 +174,7 @@ LOGGING = {
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "structured",
+            "filters": ["default_fields"],
         },
     },
 
