@@ -17,17 +17,41 @@ logger = logging.getLogger(__name__)
 )
 def process_task(self, task_id):
 
-    logger.info(f"Starting task processing task_id={task_id}")
+    logger.info(
+        "task_processing_started",
+        extra={
+            "task_id": task_id,
+            "status": "",
+            "retry_count": "",
+            "error": "",
+        }
+    )
 
     task = Task.objects.get(id=task_id)
 
-    logger.info(f"Task fetched successfully task_id={task_id}")
+    logger.info(
+        "task_fetched_successfully",
+        extra={
+            "task_id": task_id,
+            "status": "",
+            "retry_count": "",
+            "error": "",
+        }
+    )
 
     task.status = "PROCESSING"
     task.processing_started_at = timezone.now()
     task.save()
 
-    logger.info(f"Task moved to PROCESSING state task_id={task_id}")
+    logger.info(
+        "task_moved_to_processing",
+        extra={
+            "task_id": task_id,
+            "status": task.status,
+            "retry_count": "",
+            "error": "",
+        }
+    )
 
     try:
         
@@ -41,7 +65,15 @@ def process_task(self, task_id):
         task.error_message = None
         task.save()
 
-        logger.info(f"Task completed successfully task_id={task_id}")
+        logger.info(
+            "task_completed_successfully",
+            extra={
+                "task_id": task_id,
+                "status": task.status,
+                "retry_count": task.retry_count,
+                 "error": "",
+            }
+        )
 
     except Exception as e:
         task.status = "FAILED"
@@ -50,10 +82,24 @@ def process_task(self, task_id):
         task.retry_count = self.request.retries
         task.save()
 
-        logger.error(f"Task failed task_id={task_id} error={str(e)}")
+        logger.error(
+            "task_failed",
+            extra={
+                "task_id": task_id,
+                "status": task.status,
+                "retry_count": task.retry_count,
+                "error": str(e),
+            }
+        )
 
         logger.warning(
-            f"Retrying task task_id={task_id} retry_count={self.request.retries}"
+            "task_retrying",
+            extra={
+                "task_id": task_id,
+                "status": task.status,
+                "retry_count": self.request.retries,
+                "error": str(e),
+            }
         )
 
         raise
