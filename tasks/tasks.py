@@ -52,4 +52,8 @@ def process_task(self, task_id):
 
         logger.error(f"Task failed task_id={task_id} error={str(e)}")
 
+        logger.warning(
+            f"Retrying task task_id={task_id} retry_count={self.request.retries}"
+        )
+
         raise
