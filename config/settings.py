@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "tasks",
     'rest_framework',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -196,3 +197,5 @@ LOGGING = {
         "level": "INFO",
     },
 }
+
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
