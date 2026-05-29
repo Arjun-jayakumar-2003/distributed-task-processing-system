@@ -1,3 +1,7 @@
+import redis
+
+from django.conf import settings
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -86,8 +90,29 @@ def get_task(request, task_id):
 
 @api_view(["GET"])
 def health_check(request):
-    return Response(
-        {"status": "healthy"},
-        status=status.HTTP_200_OK
-    )
+
+    try:
+        redis_client = redis.Redis.from_url(
+            settings.CELERY_BROKER_URL
+        )
+
+        redis_client.ping()
+
+        return Response(
+            {
+                "status": "healthy",
+                "redis": "connected"
+            },
+            status=status.HTTP_200_OK
+        )
+
+    except redis.ConnectionError:
+
+        return Response(
+            {
+                "status": "unhealthy",
+                "redis": "disconnected"
+            },
+            status=status.HTTP_503_SERVICE_UNAVAILABLE
+        )
 
