@@ -14,6 +14,18 @@ class Task(models.Model):
         choices=STATUS_CHOICES,
         default="PENDING"
     )
+
+    PRIORITY_CHOICES = [
+        ("LOW", "LOW"),
+        ("MEDIUM", "MEDIUM"),
+        ("HIGH", "HIGH"),
+    ]
+
+    priority = models.CharField(
+        max_length=10,
+        choices=PRIORITY_CHOICES,
+        default="MEDIUM"
+    )
     
     payload = models.JSONField()
     result = models.JSONField(null=True, blank=True)
