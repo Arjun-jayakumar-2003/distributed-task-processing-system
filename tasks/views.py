@@ -83,3 +83,11 @@ def get_task(request, task_id):
 
     return Response(serializer.data)
 
+
+@api_view(["GET"])
+def health_check(request):
+    return Response(
+        {"status": "healthy"},
+        status=status.HTTP_200_OK
+    )
+
