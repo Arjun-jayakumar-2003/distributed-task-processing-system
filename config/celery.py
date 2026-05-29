@@ -2,6 +2,8 @@ import os
 
 from celery import Celery
 
+from kombu import Queue
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
 app = Celery('config')
@@ -23,5 +25,13 @@ app.conf.task_serializer = "json"
 app.conf.result_serializer = "json"
 
 app.conf.timezone = "UTC"
+
+app.conf.task_queues = (
+    Queue("default"),
+    Queue("high_priority"),
+    Queue("low_priority"),
+)
+
+app.conf.task_default_queue = "default"
 
 app.autodiscover_tasks()
