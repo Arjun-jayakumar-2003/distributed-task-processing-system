@@ -34,4 +34,8 @@ app.conf.task_queues = (
 
 app.conf.task_default_queue = "default"
 
+app.conf.task_routes = {
+    "tasks.tasks.process_task": {"queue": "default"},
+}
+
 app.autodiscover_tasks()

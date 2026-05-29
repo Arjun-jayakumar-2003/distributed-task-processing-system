@@ -51,7 +51,16 @@ def tasks(request):
 
         if serializer.is_valid():
             task = serializer.save()
-            process_task.delay(task.id)
+            queue_name = (
+                "high_priority"
+                if task.priority == "HIGH"
+                else "default"
+            )
+
+            process_task.apply_async(
+                args=[task.id],
+                queue=queue_name
+            )
 
             return Response(
                 serializer.data,
