@@ -7,6 +7,8 @@ from django.utils import timezone
 
 from .models import Task
 
+from datetime import timedelta
+
 logger = logging.getLogger(__name__)
 
 @shared_task(
@@ -103,3 +105,24 @@ def process_task(self, task_id):
         )
 
         raise
+
+
+
+@shared_task
+def cleanup_old_tasks():
+
+    cutoff_time = timezone.now() - timedelta(days=7)
+
+    deleted_count, _ = Task.objects.filter(
+        status__in=["SUCCESS", "FAILED"],
+        processing_completed_at__lt=cutoff_time
+    ).delete()
+
+    logger.info(
+        "old_tasks_cleaned",
+        extra={
+            "deleted_tasks_count": deleted_count,
+        }
+    )
+
+    return f"Deleted {deleted_count} old tasks"
